@@ -6,14 +6,16 @@
 package XML;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -22,32 +24,33 @@ import org.xml.sax.SAXException;
  *
  * @author LuLu
  */
-public class XMLManager {
+public class IndexedXMLManager {
 
+    private File file;
     private Document document;
     private int i;
     private int j;
     private int size1;
     private int size2;
 
-    public XMLManager() {
+    public IndexedXMLManager() {
         document = null;
     }
 
     public void setFile(String filepath) {
         try {
-            File file = new File(filepath);
+            file = new File(filepath);
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(file);
         } catch (SAXException | IOException | ParserConfigurationException ex) {
-            Logger.getLogger(XMLManager.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Exception from setFile() in IndexedXMLManager");
         }
     }
 
-    public ArrayList<ArrayList<String>> parseFile() throws FileNotFoundException {
+    public ArrayList<ArrayList<String>> parseFile() {
         if (document == null) {
-            throw new FileNotFoundException();
+            return null;
         }
         ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
         NodeList list = document.getChildNodes().item(0).getChildNodes();
@@ -64,18 +67,28 @@ public class XMLManager {
         return result;
     }
 
-    public void updateFileValues(ArrayList<ArrayList<String>> updatelist) throws FileNotFoundException {
+    public void updateFileValues(ArrayList<ArrayList<String>> updatelist) {
         if (document == null) {
-            throw new FileNotFoundException();
-        }
-        NodeList list = document.getChildNodes().item(0).getChildNodes();
-        size1 = updatelist.size();
-        for (i = 0; i < size1; i++) {
-            list.item(1 + 2 * i).getAttributes().item(0).setTextContent(updatelist.get(i).get(0));
-            size2 = updatelist.get(i).size();
-            for (j = 1; j < size2; j++) {
-                list.item(1 + 2 * i).getChildNodes().item(1 + 2 * j).setTextContent(updatelist.get(i).get(j));
+
+        } else {
+            NodeList list = document.getChildNodes().item(0).getChildNodes();
+            size1 = updatelist.size();
+            for (i = 0; i < size1; i++) {
+                list.item(1 + 2 * i).getAttributes().item(0).setTextContent(updatelist.get(i).get(0));
+                size2 = updatelist.get(i).size();
+                for (j = 1; j < size2; j++) {
+                    list.item(1 + 2 * i).getChildNodes().item(1 + 2 * (j - 1)).setTextContent(updatelist.get(i).get(j));
+                }
             }
+        }
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(document);
+            StreamResult result = new StreamResult(file);
+            transformer.transform(source, result);
+        } catch (TransformerException ex) {
+            System.out.println("Exception from updateFileValues() in IndexedXMLManager");
         }
     }
 }
