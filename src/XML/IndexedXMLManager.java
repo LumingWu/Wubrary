@@ -12,18 +12,24 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
+ * XMLManager- It works only if XML is correctly formated. 
  *
- * @author LuLu
+ * @author Luming Wu . Learned from mkyong.com
  */
+// Should Look For JDOM2 API to get a better performance.
+// Reason: Simple, if I read it right and rewrite it right with program, there is no reason for me to check if the XML file is right unless I am hacked.
 public class IndexedXMLManager {
 
     private File file;
@@ -91,4 +97,49 @@ public class IndexedXMLManager {
             System.out.println("Exception from updateFileValues() in IndexedXMLManager");
         }
     }
+
+    public void rewrite(ArrayList<ArrayList<String>> rewritelist) {
+        if (document == null) {
+
+        } else {
+            try {
+                DocumentBuilderFactory documentfactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder documentbuilder = documentfactory.newDocumentBuilder();
+
+                document = documentbuilder.newDocument();
+                Element rootelement = document.createElement("STORAGE");
+                document.appendChild(rootelement);
+
+                size1 = rewritelist.size();
+                for (i = 0; i < size1; i++) {
+                    Element element = document.createElement("OPTION_LIST");
+                    rootelement.appendChild(element);
+
+                    Attr attribute = document.createAttribute("NAME");
+                    attribute.setValue(rewritelist.get(i).get(0));
+                    element.setAttributeNode(attribute);
+
+                    size2 = rewritelist.get(i).size();
+                    for (j = 1; j < size2; j++) {
+                        Element subelement = document.createElement("OPTION");
+                        subelement.appendChild(document.createTextNode(rewritelist.get(i).get(j)));
+
+                        element.appendChild(subelement);
+                    }
+                }
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(document);
+                StreamResult result = new StreamResult(file);
+                transformer.transform(source, result);
+            } catch (ParserConfigurationException ex) {
+                System.out.println("Exception from rewrite() in IndexedXMLManager");
+            } catch (TransformerConfigurationException ex) {
+                System.out.println("Exception from rewrite() in IndexedXMLManager");
+            } catch (TransformerException ex) {
+                System.out.println("Exception from rewrite() in IndexedXMLManager");
+            }
+        }
+    }
+    
 }
