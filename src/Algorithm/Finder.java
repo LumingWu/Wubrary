@@ -21,9 +21,9 @@ public class Finder<T extends Comparable> {
         int left = 0;
         int right = list.size() - 1;
         int middle = -1;
-        while (left != right) {
+        while (left <= right) {
             if (middle == (left + right) / 2) {
-                return -1;
+                return middle;
             } else {
                 middle = (left + right) / 2;
             }
@@ -31,31 +31,26 @@ public class Finder<T extends Comparable> {
                 return middle;
             }
             if (list.get(middle).compareTo(item) > 0) {
-                right = middle;
+                right = middle - 1;
             } else {
-                left = middle;
+                left = middle + 1;
             }
         }
-        if (list.get((left + right) / 2).compareTo(item) == 0) {
-            return (left + right) / 2;
-        }
-        return -1;
+        return middle;
     }
 
     public ArrayList<Integer> BinarySearchArea(ArrayList<T> list, T item) {
         int index = BinarySearch(list, item);
-        if (index == -1) {
-            return null;
-        }
         ArrayList<Integer> result = new ArrayList<Integer>();
+        result.add(index);
         int left = index;
         while (list.get(left - 1).compareTo(item) == 0) {
             left = left - 1;
             result.add(left);
         }
         int right = index;
-        while (list.get(right - 1).compareTo(item) == 0) {
-            right = right - 1;
+        while (list.get(right + 1).compareTo(item) == 0) {
+            right = right + 1;
             result.add(right);
         }
         return result;
