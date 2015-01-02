@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -24,12 +25,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * XMLManager- It works only if XML is correctly formated. 
+ * XMLManager- It works only if XML is correctly formated.
  *
  * @author Luming Wu . Learned from mkyong.com
  */
 // Should Look For JDOM2 API to get a better performance.
-// Reason: Simple, if I read it right and rewrite it right with program, there is no reason for me to check if the XML file is right unless I am hacked.
 public class IndexedXMLManager {
 
     private File file;
@@ -39,8 +39,11 @@ public class IndexedXMLManager {
     private int size1;
     private int size2;
 
+    private ArrayList<ArrayList<String>> _data;
+
     public IndexedXMLManager() {
         document = null;
+        _data = new ArrayList<ArrayList<String>>();
     }
 
     public void setFile(String filepath) {
@@ -54,7 +57,8 @@ public class IndexedXMLManager {
         }
     }
 
-    public ArrayList<ArrayList<String>> parseFile() {
+    // Reason: Simple, if I read it right and rewrite it right with program, there is no reason for me to check if the XML file is right unless I am hacked.
+    public ArrayList<ArrayList<String>> quickParseFile() {
         if (document == null) {
             return null;
         }
@@ -73,7 +77,7 @@ public class IndexedXMLManager {
         return result;
     }
 
-    public void updateFileValues(ArrayList<ArrayList<String>> updatelist) {
+    public void quickUpdateFileValues(ArrayList<ArrayList<String>> updatelist) {
         if (document == null) {
 
         } else {
@@ -98,7 +102,7 @@ public class IndexedXMLManager {
         }
     }
 
-    public void rewrite(ArrayList<ArrayList<String>> rewritelist) {
+    public void quickRewrite(ArrayList<ArrayList<String>> rewritelist) {
         if (document == null) {
 
         } else {
@@ -129,6 +133,11 @@ public class IndexedXMLManager {
                 }
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+                
                 DOMSource source = new DOMSource(document);
                 StreamResult result = new StreamResult(file);
                 transformer.transform(source, result);
