@@ -27,7 +27,7 @@ public class SmartButton extends Label {
 
     public void setReleasedNode(ImageView node) {
         _static = node;
-        setGraphic(_react);
+        setGraphic(_static);
         state = 1;
     }
     
