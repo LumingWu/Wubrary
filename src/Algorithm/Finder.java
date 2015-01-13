@@ -20,13 +20,9 @@ public class Finder<T extends Comparable> {
     public int BinarySearch(ArrayList<T> list, T item) {
         int left = 0;
         int right = list.size() - 1;
-        int middle = -1;
+        int middle;
         while (left <= right) {
-            if (middle == (left + right) / 2) {
-                return middle;
-            } else {
-                middle = (left + right) / 2;
-            }
+            middle = (left + right) / 2;
             if (list.get(middle).compareTo(item) == 0) {
                 return middle;
             }
@@ -36,7 +32,7 @@ public class Finder<T extends Comparable> {
                 left = middle + 1;
             }
         }
-        return middle;
+        return -1;
     }
 
     public ArrayList<Integer> BinarySearchArea(ArrayList<T> list, T item) {

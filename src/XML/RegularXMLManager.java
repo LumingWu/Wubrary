@@ -27,23 +27,21 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * The first list is the index list. Each letter has its starting index.All name
- * must start with capital alphabet.
  *
- * @author Luming Wu . Learned from mkyong.com
+ * @author LuLu
  */
-public class IndexedXMLManager {
+public class RegularXMLManager {
 
     private File file;
-    private static IndexedXMLManager me = null;
+    private static RegularXMLManager me = null;
     private ArrayList<ArrayList<String>> _data = new ArrayList<ArrayList<String>>();
 
-    private IndexedXMLManager() {
+    private RegularXMLManager() {
     }
 
-    public static IndexedXMLManager getManager() {
+    public static RegularXMLManager getManager() {
         if (me == null) {
-            me = new IndexedXMLManager();
+            me = new RegularXMLManager();
         }
         return me;
     }
@@ -74,14 +72,11 @@ public class IndexedXMLManager {
     public synchronized void insert(ArrayList<String> newdata) {
         _data.add(newdata);
         int position = _data.size() - 1;
-        while (_data.get(position).get(0).compareTo(_data.get(position - 1).get(0)) < 0 && position > 1) {
+        while (_data.get(position).get(0).compareTo(_data.get(position - 1).get(0)) < 0) {
             ArrayList<String> temp = _data.get(position - 1);
             _data.set(position - 1, _data.get(position));
             _data.set(position, temp);
             position = position - 1;
-        }
-        for (int i = newdata.get(0).charAt(0) - 'A' + 1; i < 26; i++) {
-            _data.get(0).set(i, "" + (Integer.parseInt(_data.get(0).get(i)) + 1));
         }
     }
 
@@ -166,8 +161,8 @@ public class IndexedXMLManager {
     private class XMLFinder {
 
         public int find(String name) {
-            int left = Integer.parseInt(_data.get(0).get(name.charAt(0) - 'A'));
-            int right = Integer.parseInt(_data.get(0).get(name.charAt(0) - 'A' + 1));
+            int left = 0;
+            int right = _data.size() - 1;
             int middle;
             while (left <= right) {
                 middle = (left + right) / 2;
