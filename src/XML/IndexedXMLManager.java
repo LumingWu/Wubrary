@@ -133,17 +133,17 @@ public class IndexedXMLManager {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            
+
             //Save the document.
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(file);
             transformer.transform(source, result);
         } catch (ParserConfigurationException ex) {
-            System.out.println("Exception from rewrite() in IndexedXMLManager");
+            System.out.println("Exception from Parse of rewrite() in IndexedXMLManager");
         } catch (TransformerConfigurationException ex) {
-            System.out.println("Exception from rewrite() in IndexedXMLManager");
+            System.out.println("Exception from TransformConfiguration of rewrite() in IndexedXMLManager");
         } catch (TransformerException ex) {
-            System.out.println("Exception from rewrite() in IndexedXMLManager");
+            System.out.println("Exception from Transform of rewrite() in IndexedXMLManager");
         }
     }
 
@@ -158,37 +158,27 @@ public class IndexedXMLManager {
         }
     }
 
-    public String getOption(String name) throws Exception {
+    public String getOption(String name) {
         XMLFinder finder = new XMLFinder();
         int index = finder.find(name);
-        if (index != -1) {
-            if (_data.get(index).size() == 2) {
-                return _data.get(index).get(1);
-            } else {
-                throw new RuntimeException("The option is empty or a option list.");
-            }
-        } else {
-            throw new RuntimeException("Incorrect name or item does not exist");
+        if (_data.get(index).size() == 2) {
+            return _data.get(index).get(1);
         }
+        return null;
     }
 
-    public ArrayList<String> getOptionList(String name) throws Exception {
+    public ArrayList<String> getOptionList(String name) {
         XMLFinder finder = new XMLFinder();
         int index = finder.find(name);
-        if (index != -1) {
-            int size = _data.get(index).size();
-            if (size > 2) {
-                ArrayList<String> list = new ArrayList<String>();
-                for (int i = 1; i < size; i++) {
-                    list.add(_data.get(index).get(i));
-                }
-                return list;
-            } else {
-                throw new RuntimeException("The option is empty or not a option list.");
+        int size = _data.get(index).size();
+        if (size > 2) {
+            ArrayList<String> list = new ArrayList<String>();
+            for (int i = 1; i < size; i++) {
+                list.add(_data.get(index).get(i));
             }
-        } else {
-            throw new RuntimeException("Incorrect name or item does not exist");
+            return list;
         }
+        return null;
     }
 
     private class XMLFinder {
