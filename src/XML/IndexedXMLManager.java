@@ -87,15 +87,29 @@ public class IndexedXMLManager {
 
     public void rewrite() {
         try {
+            //Get builder from singleton structure.
             DocumentBuilderFactory documentfactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentbuilder = documentfactory.newDocumentBuilder();
 
+            //Create first node for being a nodelist;
             Document document = documentbuilder.newDocument();
             Element rootelement = document.createElement("STORAGE");
             document.appendChild(rootelement);
+            //Create the index nodelist and add it to storage.
+            Element firstelement = document.createElement("OPTION_LIST");
+            rootelement.appendChild(firstelement);
+            Attr firstattribute = document.createAttribute("NAME");
+            firstattribute.setValue("INDEX");
+            firstelement.setAttributeNode(firstattribute);
+            for (int k = 0; k < 26; k++) {
+                Element initialsubelement = document.createElement("OPTION");
+                initialsubelement.appendChild(document.createTextNode(_data.get(0).get(k)));
 
+                firstelement.appendChild(initialsubelement);
+            }
+            //Create remaining nodelists and add them to storage.
             int size1 = _data.size();
-            for (int i = 0; i < size1; i++) {
+            for (int i = 1; i < size1; i++) {
                 Element element = document.createElement("OPTION_LIST");
                 rootelement.appendChild(element);
 
@@ -111,13 +125,16 @@ public class IndexedXMLManager {
                     element.appendChild(subelement);
                 }
             }
+
+            //Format the document.
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
+            
+            //Save the document.
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(file);
             transformer.transform(source, result);
@@ -127,6 +144,17 @@ public class IndexedXMLManager {
             System.out.println("Exception from rewrite() in IndexedXMLManager");
         } catch (TransformerException ex) {
             System.out.println("Exception from rewrite() in IndexedXMLManager");
+        }
+    }
+
+    public void indexScan() {
+        _data.get(0).clear();
+        int target = 'A';
+        for (int i = 1; i < _data.size(); i++) {
+            if (_data.get(i).get(0).charAt(0) == target) {
+                _data.get(0).add("" + i);
+                target = target + 1;
+            }
         }
     }
 
@@ -166,8 +194,14 @@ public class IndexedXMLManager {
     private class XMLFinder {
 
         public int find(String name) {
-            int left = Integer.parseInt(_data.get(0).get(name.charAt(0) - 'A'));
-            int right = Integer.parseInt(_data.get(0).get(name.charAt(0) - 'A' + 1));
+            int datainitial = name.charAt(0) - 'A';
+            int left = Integer.parseInt(_data.get(0).get(datainitial));
+            int right;
+            if (datainitial < 25) {
+                right = Integer.parseInt(_data.get(0).get(datainitial + 1));
+            } else {
+                right = _data.size() - 1;
+            }
             int middle;
             while (left <= right) {
                 middle = (left + right) / 2;
