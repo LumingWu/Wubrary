@@ -132,10 +132,10 @@ public class RegularXMLManager {
             if (_data.get(index).size() == 2) {
                 return _data.get(index).get(1);
             } else {
-                throw new Exception("The option is empty or a option list.");
+                throw new RuntimeException("The option is empty or a option list.");
             }
         } else {
-            throw new Exception("Incorrect name or item does not exist");
+            throw new RuntimeException("Incorrect name or item does not exist");
         }
     }
 
@@ -151,10 +151,10 @@ public class RegularXMLManager {
                 }
                 return list;
             } else {
-                throw new Exception("The option is empty or not a option list.");
+                throw new RuntimeException("The option is empty or not a option list.");
             }
         } else {
-            throw new Exception("Incorrect name or item does not exist");
+            throw new RuntimeException("Incorrect name or item does not exist");
         }
     }
 
