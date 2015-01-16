@@ -84,6 +84,14 @@ public class IndexedXMLManager {
             _data.get(0).set(i, "" + (Integer.parseInt(_data.get(0).get(i)) + 1));
         }
     }
+    
+    public synchronized void remove(String name){
+        XMLFinder finder = new XMLFinder();
+        _data.remove(finder.find(name));
+        for (int i = name.charAt(0) - 'A' + 1; i < 26; i++) {
+            _data.get(0).set(i, "" + (Integer.parseInt(_data.get(0).get(i)) - 1));
+        }
+    }
 
     public void rewrite() {
         try {

@@ -68,8 +68,6 @@ public class RegularXMLManager {
             Logger.getLogger(RegularXMLManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
 
     public synchronized void insert(ArrayList<String> newdata) {
         _data.add(newdata);
@@ -168,6 +166,11 @@ public class RegularXMLManager {
             return list;
         }
         return null;
+    }
+    
+    public synchronized void remove(String name){
+        XMLFinder finder = new XMLFinder();
+        _data.remove(finder.find(name));
     }
 
     private class XMLFinder {
