@@ -68,6 +68,8 @@ public class RegularXMLManager {
             Logger.getLogger(RegularXMLManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
 
     public synchronized void insert(ArrayList<String> newdata) {
         _data.add(newdata);
@@ -79,7 +81,27 @@ public class RegularXMLManager {
             position = position - 1;
         }
     }
+    
+    public synchronized void sort() {
+        for (int i = 1; i < _data.size(); i++) {
+            int position = i;
+            while (_data.get(position).get(0).compareTo(_data.get(position - 1).get(0)) > 0) {
+                exchange(position, position - 1);
+                position = position - 1;
+                if (position == 0) {
+                    break;
+                }
+            }
+        }
+    }
 
+    private void exchange(int index1, int index2) {
+        ArrayList<String> temp = _data.get(index1);
+        _data.set(index1, _data.get(index2));
+        _data.set(index2, temp);
+    }
+
+    
     public void rewrite() {
         try {
             DocumentBuilderFactory documentfactory = DocumentBuilderFactory.newInstance();
