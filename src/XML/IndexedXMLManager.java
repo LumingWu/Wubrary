@@ -35,17 +35,9 @@ import org.xml.sax.SAXException;
 public class IndexedXMLManager {
 
     private File file;
-    private static IndexedXMLManager me = null;
     private ArrayList<OptionList> _data = new ArrayList<OptionList>();
 
-    private IndexedXMLManager() {
-    }
-
-    public static IndexedXMLManager getManager() {
-        if (me == null) {
-            me = new IndexedXMLManager();
-        }
-        return me;
+    public IndexedXMLManager() {
     }
 
     public void setFile(String filePath) {
@@ -157,7 +149,7 @@ public class IndexedXMLManager {
     public void sort() {
         for (int i = 2; i < _data.size(); i++) {
             int position = i;
-            while (_data.get(position).compareTo(_data.get(position - 1)) > 0) {
+            while (_data.get(position).compareTo(_data.get(position - 1)) < 0) {
                 exchange(position, position - 1);
                 position = position - 1;
                 if (position == 1) {
@@ -200,6 +192,10 @@ public class IndexedXMLManager {
             return _data.get(index).getList();
         }
         return null;
+    }
+    
+    public ArrayList<OptionList> getData(){
+        return _data;
     }
 
     private class XMLFinder {

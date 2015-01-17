@@ -7,10 +7,9 @@
         </group>
         <group name="Wubrary">
             <file>file:/C:/Users/LuLu/Documents/NetBeansProjects/Wubrary/src/XML/IndexedXMLManager.java</file>
-            <file>file:/C:/Users/LuLu/Documents/NetBeansProjects/Wubrary/src/XML/HeapXMLManager.java</file>
-            <file>file:/C:/Users/LuLu/Documents/NetBeansProjects/Wubrary/src/Algorithm/Sorter.java</file>
+            <file>file:/C:/Users/LuLu/Documents/NetBeansProjects/Wubrary/src/XML/OptionList.java</file>
             <file>file:/C:/Users/LuLu/Documents/NetBeansProjects/Wubrary/src/XML/RegularXMLManager.java</file>
-            <file>file:/C:/Users/LuLu/Documents/NetBeansProjects/Wubrary/src/Algorithm/Heap.java</file>
+            <file>file:/C:/Users/LuLu/Documents/NetBeansProjects/Wubrary/src/Algorithm/Finder.java</file>
         </group>
     </open-files>
 </project-private>

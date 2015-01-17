@@ -11,64 +11,68 @@ import java.util.ArrayList;
  *
  * @author Luming Wu
  */
-public class OptionList implements Comparable{
+public class OptionList implements Comparable {
+
     private ArrayList<String> _list;
     private String _id;
-    
-    public OptionList(){
-        _list =  new ArrayList<String>();
+
+    public OptionList() {
+        _list = new ArrayList<String>();
     }
-    public OptionList(String id){
+
+    public OptionList(String id) {
         _id = id;
-        _list = new ArrayList<String>();        
+        _list = new ArrayList<String>();
     }
-    public OptionList(String id, ArrayList<String> list){
+
+    public OptionList(String id, ArrayList<String> list) {
         _list = list;
         _id = id;
     }
-    public OptionList(ArrayList<String> list){
+
+    public OptionList(ArrayList<String> list) {
         _list = list;
     }
-    
-    public String getID(){
+
+    public String getID() {
         return _id;
     }
-    
-    public ArrayList<String> getList(){
+
+    public ArrayList<String> getList() {
         return _list;
     }
-    
-    public void setID(String id){
+
+    public void setID(String id) {
         _id = id;
     }
-    
-    public void setList(ArrayList<String> list){
+
+    public void setList(ArrayList<String> list) {
         _list = list;
     }
-    
-    public void insert(String item){
+
+    public void insert(String item) {
         _list.add(item);
     }
-    
-    public boolean isOptionList(){
+
+    public boolean isOptionList() {
         return _list.size() > 1;
     }
-    
-    public boolean isOption(){
+
+    public boolean isOption() {
         return _list.size() == 1;
     }
-    
-    public boolean isEmpty(){
-        return _list.isEmpty();
+
+    public boolean isEmpty() {
+        return _list.get(0).length() == 0;
     }
 
     @Override
     public int compareTo(Object o) {
         return this.getID().compareTo(o.toString());
     }
-    
-    public String toString(){
+
+    public String toString() {
         return _id;
     }
-            
+
 }

@@ -31,20 +31,13 @@ import org.xml.sax.SAXException;
  * @author LuLu
  */
 public class HeapXMLManager {
+
     private File file;
-    private static HeapXMLManager me = null;
     private ArrayList<ArrayList<String>> _data = new ArrayList<ArrayList<String>>();
 
     private HeapXMLManager() {
     }
 
-    public static HeapXMLManager getManager() {
-        if (me == null) {
-            me = new HeapXMLManager();
-        }
-        return me;
-    }
-    
     public void setFile(String filePath) {
         _data.clear();
         try {
@@ -67,7 +60,7 @@ public class HeapXMLManager {
             Logger.getLogger(RegularXMLManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void rewrite() {
         try {
             //Get builder from singleton structure.
@@ -129,12 +122,12 @@ public class HeapXMLManager {
             System.out.println("Exception from Transform of rewrite() in IndexedXMLManager");
         }
     }
-    
+
     public void insert(ArrayList<String> item) {
         _data.add(item);
         decreaseKey(_data.size() - 1);
     }
-    
+
     private void decreaseKey(int index) {
         int i = index;
         while (i > 0 && _data.get(getParent(i)).get(0).compareTo(_data.get(i).get(0)) >= 0) {
@@ -142,11 +135,11 @@ public class HeapXMLManager {
             i = getParent(i);
         }
     }
-    
+
     private int getParent(int index) {
         return index / 2;
     }
-    
+
     private int getLeft(int index) {
         if (index == 0) {
             return 1;
@@ -160,11 +153,11 @@ public class HeapXMLManager {
         }
         return 2 * index + 1;
     }
-    
+
     private void exchange(int index1, int index2) {
         ArrayList<String> temp = _data.get(index1);
         _data.set(index1, _data.get(index2));
         _data.set(index2, temp);
     }
-    
+
 }

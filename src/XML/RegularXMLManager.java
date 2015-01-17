@@ -36,7 +36,7 @@ public class RegularXMLManager {
     private static RegularXMLManager me = null;
     private ArrayList<OptionList> _data = new ArrayList<OptionList>();
 
-    private RegularXMLManager() {
+    public RegularXMLManager() {
     }
 
     public static RegularXMLManager getManager() {
@@ -71,20 +71,26 @@ public class RegularXMLManager {
     public void insert(OptionList newdata) {
         _data.add(newdata);
         int position = _data.size() - 1;
-        while (_data.get(position).compareTo(_data.get(position - 1)) < 0 && position > 0) {
+        while (_data.get(position).compareTo(_data.get(position - 1)) < 0) {
             OptionList temp = _data.get(position - 1);
             _data.set(position - 1, _data.get(position));
             _data.set(position, temp);
             position = position - 1;
+            if (position == 0) {
+                break;
+            }
         }
     }
-    
+
     public void sort() {
         for (int i = 1; i < _data.size(); i++) {
             int position = i;
-            while (_data.get(position).compareTo(_data.get(position - 1)) > 0 && position > 0) {
+            while (_data.get(position).compareTo(_data.get(position - 1)) < 0) {
                 exchange(position, position - 1);
                 position = position - 1;
+                if (position == 0) {
+                    break;
+                }
             }
         }
     }
@@ -95,7 +101,6 @@ public class RegularXMLManager {
         _data.set(index2, temp);
     }
 
-    
     public void rewrite() {
         try {
             DocumentBuilderFactory documentfactory = DocumentBuilderFactory.newInstance();
@@ -115,7 +120,7 @@ public class RegularXMLManager {
                 element.setAttributeNode(attribute);
 
                 int size2 = _data.get(i).getList().size();
-                for (int j = 1; j < size2; j++) {
+                for (int j = 0; j < size2; j++) {
                     Element subelement = document.createElement("OPTION");
                     subelement.appendChild(document.createTextNode(_data.get(i).getList().get(j)));
 
@@ -158,10 +163,14 @@ public class RegularXMLManager {
         }
         return null;
     }
-    
-    public void remove(String name){
+
+    public void remove(String name) {
         XMLFinder finder = new XMLFinder();
         _data.remove(finder.find(name));
+    }
+
+    public ArrayList<OptionList> getData() {
+        return _data;
     }
 
     private class XMLFinder {
