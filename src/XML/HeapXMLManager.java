@@ -30,22 +30,21 @@ import org.xml.sax.SAXException;
  *
  * @author LuLu
  */
-public class RegularXMLManager {
-
+public class HeapXMLManager {
     private File file;
-    private static RegularXMLManager me = null;
-    private ArrayList<OptionList> _data = new ArrayList<OptionList>();
+    private static HeapXMLManager me = null;
+    private ArrayList<ArrayList<String>> _data = new ArrayList<ArrayList<String>>();
 
-    private RegularXMLManager() {
+    private HeapXMLManager() {
     }
 
-    public static RegularXMLManager getManager() {
+    public static HeapXMLManager getManager() {
         if (me == null) {
-            me = new RegularXMLManager();
+            me = new HeapXMLManager();
         }
         return me;
     }
-
+    
     public void setFile(String filePath) {
         _data.clear();
         try {
@@ -56,10 +55,11 @@ public class RegularXMLManager {
             NodeList list = document.getChildNodes().item(0).getChildNodes();
             int columns = list.getLength();
             for (int i = 1; i < columns; i = i + 2) {
-                OptionList columndata = new OptionList(list.item(i).getAttributes().item(0).getTextContent());
+                ArrayList<String> columndata = new ArrayList<String>();
+                columndata.add(list.item(i).getAttributes().item(0).getTextContent());
                 int rows = list.item(i).getChildNodes().getLength();
                 for (int j = 1; j < rows; j = j + 2) {
-                    columndata.insert(list.item(i).getChildNodes().item(j).getTextContent());
+                    columndata.add(list.item(i).getChildNodes().item(j).getTextContent());
                 }
                 _data.add(columndata);
             }
@@ -67,61 +67,49 @@ public class RegularXMLManager {
             Logger.getLogger(RegularXMLManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    public void insert(OptionList newdata) {
-        _data.add(newdata);
-        int position = _data.size() - 1;
-        while (_data.get(position).compareTo(_data.get(position - 1)) < 0 && position > 0) {
-            OptionList temp = _data.get(position - 1);
-            _data.set(position - 1, _data.get(position));
-            _data.set(position, temp);
-            position = position - 1;
-        }
-    }
-    
-    public void sort() {
-        for (int i = 1; i < _data.size(); i++) {
-            int position = i;
-            while (_data.get(position).compareTo(_data.get(position - 1)) > 0 && position > 0) {
-                exchange(position, position - 1);
-                position = position - 1;
-            }
-        }
-    }
-
-    private void exchange(int index1, int index2) {
-        OptionList temp = _data.get(index1);
-        _data.set(index1, _data.get(index2));
-        _data.set(index2, temp);
-    }
-
     
     public void rewrite() {
         try {
+            //Get builder from singleton structure.
             DocumentBuilderFactory documentfactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentbuilder = documentfactory.newDocumentBuilder();
 
+            //Create first node for being a nodelist;
             Document document = documentbuilder.newDocument();
             Element rootelement = document.createElement("STORAGE");
             document.appendChild(rootelement);
+            //Create the index nodelist and add it to storage.
+            Element firstelement = document.createElement("OPTION_LIST");
+            rootelement.appendChild(firstelement);
+            Attr firstattribute = document.createAttribute("NAME");
+            firstattribute.setValue("INDEX");
+            firstelement.setAttributeNode(firstattribute);
+            for (int k = 0; k < 26; k++) {
+                Element initialsubelement = document.createElement("OPTION");
+                initialsubelement.appendChild(document.createTextNode(_data.get(0).get(k)));
 
+                firstelement.appendChild(initialsubelement);
+            }
+            //Create remaining nodelists and add them to storage.
             int size1 = _data.size();
-            for (int i = 0; i < size1; i++) {
+            for (int i = 1; i < size1; i++) {
                 Element element = document.createElement("OPTION_LIST");
                 rootelement.appendChild(element);
 
                 Attr attribute = document.createAttribute("NAME");
-                attribute.setValue(_data.get(i).getID());
+                attribute.setValue(_data.get(i).get(0));
                 element.setAttributeNode(attribute);
 
-                int size2 = _data.get(i).getList().size();
+                int size2 = _data.get(i).size();
                 for (int j = 1; j < size2; j++) {
                     Element subelement = document.createElement("OPTION");
-                    subelement.appendChild(document.createTextNode(_data.get(i).getList().get(j)));
+                    subelement.appendChild(document.createTextNode(_data.get(i).get(j)));
 
                     element.appendChild(subelement);
                 }
             }
+
+            //Format the document.
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
@@ -129,6 +117,7 @@ public class RegularXMLManager {
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
+            //Save the document.
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(file);
             transformer.transform(source, result);
@@ -140,48 +129,42 @@ public class RegularXMLManager {
             System.out.println("Exception from Transform of rewrite() in IndexedXMLManager");
         }
     }
-
-    public String getOption(String name) {
-        XMLFinder finder = new XMLFinder();
-        int index = finder.find(name);
-        if (_data.get(index).isOption()) {
-            return _data.get(index).getList().get(0);
-        }
-        return null;
-    }
-
-    public ArrayList<String> getOptionList(String name) {
-        XMLFinder finder = new XMLFinder();
-        int index = finder.find(name);
-        if (_data.get(index).isOptionList()) {
-            return _data.get(index).getList();
-        }
-        return null;
+    
+    public void insert(ArrayList<String> item) {
+        _data.add(item);
+        decreaseKey(_data.size() - 1);
     }
     
-    public void remove(String name){
-        XMLFinder finder = new XMLFinder();
-        _data.remove(finder.find(name));
-    }
-
-    private class XMLFinder {
-
-        public int find(String name) {
-            int left = 0;
-            int right = _data.size() - 1;
-            int middle;
-            while (left <= right) {
-                middle = (left + right) / 2;
-                if (_data.get(middle).getID().compareTo(name) == 0) {
-                    return middle;
-                }
-                if (_data.get(middle).getID().compareTo(name) > 0) {
-                    right = middle - 1;
-                } else {
-                    left = middle + 1;
-                }
-            }
-            return -1;
+    private void decreaseKey(int index) {
+        int i = index;
+        while (i > 0 && _data.get(getParent(i)).get(0).compareTo(_data.get(i).get(0)) >= 0) {
+            exchange(i, getParent(i));
+            i = getParent(i);
         }
     }
+    
+    private int getParent(int index) {
+        return index / 2;
+    }
+    
+    private int getLeft(int index) {
+        if (index == 0) {
+            return 1;
+        }
+        return 2 * index;
+    }
+
+    private int getRight(int index) {
+        if (index == 0) {
+            return 2;
+        }
+        return 2 * index + 1;
+    }
+    
+    private void exchange(int index1, int index2) {
+        ArrayList<String> temp = _data.get(index1);
+        _data.set(index1, _data.get(index2));
+        _data.set(index2, temp);
+    }
+    
 }

@@ -42,7 +42,7 @@ public class Heap<T extends Comparable<T>> {
         decreaseKey(_heapsize - 1);
     }
 
-    public void decreaseKey(int index) {
+    private void decreaseKey(int index) {
         int i = index;
         while (i > 0 && _heap.get(getParent(i)).compareTo(_heap.get(i)) >= 0) {
             exchange(i, getParent(i));

@@ -36,7 +36,7 @@ public class IndexedXMLManager {
 
     private File file;
     private static IndexedXMLManager me = null;
-    private ArrayList<ArrayList<String>> _data = new ArrayList<ArrayList<String>>();
+    private ArrayList<OptionList> _data = new ArrayList<OptionList>();
 
     private IndexedXMLManager() {
     }
@@ -58,11 +58,10 @@ public class IndexedXMLManager {
             NodeList list = document.getChildNodes().item(0).getChildNodes();
             int columns = list.getLength();
             for (int i = 1; i < columns; i = i + 2) {
-                ArrayList<String> columndata = new ArrayList<String>();
-                columndata.add(list.item(i).getAttributes().item(0).getTextContent());
+                OptionList columndata = new OptionList(list.item(i).getAttributes().item(0).getTextContent());
                 int rows = list.item(i).getChildNodes().getLength();
                 for (int j = 1; j < rows; j = j + 2) {
-                    columndata.add(list.item(i).getChildNodes().item(j).getTextContent());
+                    columndata.insert(list.item(i).getChildNodes().item(j).getTextContent());
                 }
                 _data.add(columndata);
             }
@@ -71,25 +70,25 @@ public class IndexedXMLManager {
         }
     }
 
-    public synchronized void insert(ArrayList<String> newdata) {
+    public void insert(OptionList newdata) {
         _data.add(newdata);
         int position = _data.size() - 1;
-        while (_data.get(position).get(0).compareTo(_data.get(position - 1).get(0)) < 0 && position > 1) {
-            ArrayList<String> temp = _data.get(position - 1);
+        while (_data.get(position).compareTo(_data.get(position - 1)) < 0 && position > 1) {
+            OptionList temp = _data.get(position - 1);
             _data.set(position - 1, _data.get(position));
             _data.set(position, temp);
             position = position - 1;
         }
-        for (int i = newdata.get(0).charAt(0) - 'A' + 1; i < 26; i++) {
-            _data.get(0).set(i, "" + (Integer.parseInt(_data.get(0).get(i)) + 1));
+        for (int i = newdata.getID().charAt(0) - 'A' + 1; i < 26; i++) {
+            _data.get(0).getList().set(i, "" + (Integer.parseInt(_data.get(0).getList().get(i)) + 1));
         }
     }
-    
-    public synchronized void remove(String name){
+
+    public void remove(String name) {
         XMLFinder finder = new XMLFinder();
         _data.remove(finder.find(name));
         for (int i = name.charAt(0) - 'A' + 1; i < 26; i++) {
-            _data.get(0).set(i, "" + (Integer.parseInt(_data.get(0).get(i)) - 1));
+            _data.get(0).getList().set(i, "" + (Integer.parseInt(_data.get(0).getList().get(i)) - 1));
         }
     }
 
@@ -111,7 +110,7 @@ public class IndexedXMLManager {
             firstelement.setAttributeNode(firstattribute);
             for (int k = 0; k < 26; k++) {
                 Element initialsubelement = document.createElement("OPTION");
-                initialsubelement.appendChild(document.createTextNode(_data.get(0).get(k)));
+                initialsubelement.appendChild(document.createTextNode(_data.get(0).getList().get(k)));
 
                 firstelement.appendChild(initialsubelement);
             }
@@ -122,13 +121,13 @@ public class IndexedXMLManager {
                 rootelement.appendChild(element);
 
                 Attr attribute = document.createAttribute("NAME");
-                attribute.setValue(_data.get(i).get(0));
+                attribute.setValue(_data.get(i).getID());
                 element.setAttributeNode(attribute);
 
-                int size2 = _data.get(i).size();
+                int size2 = _data.get(i).getList().size();
                 for (int j = 1; j < size2; j++) {
                     Element subelement = document.createElement("OPTION");
-                    subelement.appendChild(document.createTextNode(_data.get(i).get(j)));
+                    subelement.appendChild(document.createTextNode(_data.get(i).getList().get(j)));
 
                     element.appendChild(subelement);
                 }
@@ -155,10 +154,10 @@ public class IndexedXMLManager {
         }
     }
 
-    public synchronized void sort() {
+    public void sort() {
         for (int i = 2; i < _data.size(); i++) {
             int position = i;
-            while (_data.get(position).get(0).compareTo(_data.get(position - 1).get(0)) > 0) {
+            while (_data.get(position).compareTo(_data.get(position - 1)) > 0) {
                 exchange(position, position - 1);
                 position = position - 1;
                 if (position == 1) {
@@ -169,17 +168,17 @@ public class IndexedXMLManager {
     }
 
     private void exchange(int index1, int index2) {
-        ArrayList<String> temp = _data.get(index1);
+        OptionList temp = _data.get(index1);
         _data.set(index1, _data.get(index2));
         _data.set(index2, temp);
     }
 
-    public synchronized void indexScan() {
-        _data.get(0).clear();
+    public void indexScan() {
+        _data.get(0).getList().clear();
         int target = 'A';
         for (int i = 1; i < _data.size(); i++) {
-            if (_data.get(i).get(0).charAt(0) == target) {
-                _data.get(0).add("" + i);
+            if (_data.get(i).getID().charAt(0) == target) {
+                _data.get(0).getList().add("" + i);
                 target = target + 1;
             }
         }
@@ -188,8 +187,8 @@ public class IndexedXMLManager {
     public String getOption(String name) {
         XMLFinder finder = new XMLFinder();
         int index = finder.find(name);
-        if (_data.get(index).size() == 2) {
-            return _data.get(index).get(1);
+        if (_data.get(index).isOption()) {
+            return _data.get(index).getList().get(0);
         }
         return null;
     }
@@ -197,13 +196,8 @@ public class IndexedXMLManager {
     public ArrayList<String> getOptionList(String name) {
         XMLFinder finder = new XMLFinder();
         int index = finder.find(name);
-        int size = _data.get(index).size();
-        if (size > 2) {
-            ArrayList<String> list = new ArrayList<String>();
-            for (int i = 1; i < size; i++) {
-                list.add(_data.get(index).get(i));
-            }
-            return list;
+        if (_data.get(index).isOptionList()) {
+            return _data.get(index).getList();
         }
         return null;
     }
@@ -212,20 +206,20 @@ public class IndexedXMLManager {
 
         public int find(String name) {
             int datainitial = name.charAt(0) - 'A';
-            int left = Integer.parseInt(_data.get(0).get(datainitial));
+            int left = Integer.parseInt(_data.get(0).getList().get(datainitial));
             int right;
             if (datainitial < 25) {
-                right = Integer.parseInt(_data.get(0).get(datainitial + 1));
+                right = Integer.parseInt(_data.get(0).getList().get(datainitial + 1));
             } else {
                 right = _data.size() - 1;
             }
             int middle;
             while (left <= right) {
                 middle = (left + right) / 2;
-                if (_data.get(middle).get(0).compareTo(name) == 0) {
+                if (_data.get(middle).getID().compareTo(name) == 0) {
                     return middle;
                 }
-                if (_data.get(middle).get(0).compareTo(name) > 0) {
+                if (_data.get(middle).getID().compareTo(name) > 0) {
                     right = middle - 1;
                 } else {
                     left = middle + 1;

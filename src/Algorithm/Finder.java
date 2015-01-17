@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * @author LuLu
  */
-public class Finder<T extends Comparable> {
+public class Finder<T extends Comparable<T>> {
 
     public Finder() {
 
