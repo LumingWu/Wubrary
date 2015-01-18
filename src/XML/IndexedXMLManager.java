@@ -117,7 +117,7 @@ public class IndexedXMLManager {
                 element.setAttributeNode(attribute);
 
                 int size2 = _data.get(i).getList().size();
-                for (int j = 1; j < size2; j++) {
+                for (int j = 0; j < size2; j++) {
                     Element subelement = document.createElement("OPTION");
                     subelement.appendChild(document.createTextNode(_data.get(i).getList().get(j)));
 
@@ -166,13 +166,25 @@ public class IndexedXMLManager {
     }
 
     public void indexScan() {
-        _data.get(0).getList().clear();
-        int target = 'A';
-        for (int i = 1; i < _data.size(); i++) {
-            if (_data.get(i).getID().charAt(0) == target) {
-                _data.get(0).getList().add("" + i);
+        int target = 0;
+        int i =1;
+        int size = _data.size();
+        while(i<_data.size()){
+            if(_data.get(i).getID().charAt(0) - 'A' > target){
+                _data.get(0).getList().set(target, "" + (_data.size() - 1));
                 target = target + 1;
             }
+            else{
+                if(_data.get(i).getID().charAt(0) - 'A' == target){
+                    _data.get(0).getList().set(target, "" + i);
+                    i = i + 1;
+                    target = target + 1;
+                }
+            }
+        }
+        while(target < 26){
+            _data.get(0).getList().set(target, "" + (_data.size() - 1));
+            target = target + 1;
         }
     }
 
@@ -193,8 +205,8 @@ public class IndexedXMLManager {
         }
         return null;
     }
-    
-    public ArrayList<OptionList> getData(){
+
+    public ArrayList<OptionList> getData() {
         return _data;
     }
 

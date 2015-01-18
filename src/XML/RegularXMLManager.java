@@ -33,17 +33,9 @@ import org.xml.sax.SAXException;
 public class RegularXMLManager {
 
     private File file;
-    private static RegularXMLManager me = null;
     private ArrayList<OptionList> _data = new ArrayList<OptionList>();
 
     public RegularXMLManager() {
-    }
-
-    public static RegularXMLManager getManager() {
-        if (me == null) {
-            me = new RegularXMLManager();
-        }
-        return me;
     }
 
     public void setFile(String filePath) {
