@@ -48,8 +48,8 @@ public class RegularXMLManager {
             NodeList list = document.getChildNodes().item(0).getChildNodes();
             int columns = list.getLength();
             for (int i = 1; i < columns; i = i + 2) {
-                OptionList columndata = new OptionList(list.item(i).getAttributes().item(0).getTextContent());
                 int rows = list.item(i).getChildNodes().getLength();
+                OptionList columndata = new OptionList(list.item(i).getAttributes().item(0).getTextContent(), new ArrayList<String>(rows));
                 for (int j = 1; j < rows; j = j + 2) {
                     columndata.insert(list.item(i).getChildNodes().item(j).getTextContent());
                 }

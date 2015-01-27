@@ -50,8 +50,8 @@ public class IndexedXMLManager {
             NodeList list = document.getChildNodes().item(0).getChildNodes();
             int columns = list.getLength();
             for (int i = 1; i < columns; i = i + 2) {
-                OptionList columndata = new OptionList(list.item(i).getAttributes().item(0).getTextContent());
                 int rows = list.item(i).getChildNodes().getLength();
+                OptionList columndata = new OptionList(list.item(i).getAttributes().item(0).getTextContent(), new ArrayList<String>(rows));
                 for (int j = 1; j < rows; j = j + 2) {
                     columndata.insert(list.item(i).getChildNodes().item(j).getTextContent());
                 }
@@ -167,22 +167,21 @@ public class IndexedXMLManager {
 
     public void indexScan() {
         int target = 0;
-        int i =1;
+        int i = 1;
         int size = _data.size();
-        while(i<_data.size()){
-            if(_data.get(i).getID().charAt(0) - 'A' > target){
+        while (i < _data.size()) {
+            if (_data.get(i).getID().charAt(0) - 'A' > target) {
                 _data.get(0).getList().set(target, "" + (_data.size() - 1));
                 target = target + 1;
-            }
-            else{
-                if(_data.get(i).getID().charAt(0) - 'A' == target){
+            } else {
+                if (_data.get(i).getID().charAt(0) - 'A' == target) {
                     _data.get(0).getList().set(target, "" + i);
                     i = i + 1;
                     target = target + 1;
                 }
             }
         }
-        while(target < 26){
+        while (target < 26) {
             _data.get(0).getList().set(target, "" + (_data.size() - 1));
             target = target + 1;
         }
